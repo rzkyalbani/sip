@@ -68,3 +68,87 @@ Struktur Aplikasi Next.js:
     /members
     /reports
   page.js (homepage)
+
+
+Entitas Utama dan Relasinya
+1. Books (Buku)
+    id: int (PK)
+    title: varchar
+    author_id: int (FK)
+    publisher_id: int (FK)
+    isbn: varchar
+    publication_year: year
+    category_id: int (FK)
+    description: text
+    quantity: int
+    available_quantity: int
+    location: varchar (rak/posisi)
+    created_at: timestamp
+    updated_at: timestamp
+2. Authors (Penulis)
+    id: int (PK)
+    name: varchar
+    bio: text (opsional)
+    created_at: timestamp
+    updated_at: timestamp
+3. Publishers (Penerbit)
+    id: int (PK)
+    name: varchar
+    address: text (opsional)
+    contact: varchar (opsional)
+    created_at: timestamp
+    updated_at: timestamp
+4. Categories (Kategori)
+    id: int (PK)
+    name: varchar
+    description: text (opsional)
+    created_at: timestamp
+    updated_at: timestamp
+5. Members (Anggota)
+    id: int (PK)
+    member_code: varchar (kode unik anggota)
+    name: varchar
+    email: varchar
+    phone: varchar
+    address: text
+    status: enum ('active', 'inactive', 'blocked')
+    join_date: date
+    created_at: timestamp
+    updated_at: timestamp
+6. Borrowings (Peminjaman)
+    id: int (PK)
+    member_id: int (FK)
+    book_id: int (FK)
+    borrow_date: date
+    due_date: date
+    return_date: date (null jika belum dikembalikan)
+    status: enum ('borrowed', 'returned', 'overdue')
+    created_by: int (FK ke Users - Admin yang menginput)
+    created_at: timestamp
+    updated_at: timestamp
+7. Fines (Denda)
+    id: int (PK)
+    borrowing_id: int (FK)
+    amount: decimal
+    paid_amount: decimal
+    paid_date: date (null jika belum dibayar)
+    status: enum ('unpaid', 'partially_paid', 'paid')
+    created_at: timestamp
+    updated_at: timestamp
+8. Users (Pengguna/Admin)
+    id: int (PK)
+    name: varchar
+    email: varchar
+    password: varchar
+    role: enum ('admin', 'staff')
+    created_at: timestamp
+    updated_at: timestamp
+
+Relasi Antar Entitas
+    Books - Authors: Many-to-One (Satu penulis dapat menulis banyak buku)
+    Books - Publishers: Many-to-One (Satu penerbit dapat menerbitkan banyak buku)
+    Books - Categories: Many-to-One (Satu kategori dapat memiliki banyak buku)
+    Members - Borrowings: One-to-Many (Satu anggota dapat meminjam banyak buku)
+    Books - Borrowings: One-to-Many (Satu buku dapat dipinjam berkali-kali)
+    Borrowings - Fines: One-to-One (Satu peminjaman dapat menghasilkan satu denda)
+    Users - Borrowings: One-to-Many (Satu admin dapat mencatat banyak transaksi)
