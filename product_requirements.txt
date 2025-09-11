@@ -1,0 +1,70 @@
+Sistem Informasi Manajemen Perpustakaan
+
+Fitur Umum Sistem Informasi Manajemen Perpustakaan (*{} berarti disisihkan terlebih dahulu)
+1. Manajemen Buku
+Katalog Buku: Pencatatan detail buku (judul, penulis, penerbit, tahun terbit, ISBN, kategori/genre)
+Penambahan Buku Baru: Form untuk menambahkan buku ke inventaris
+Edit & Hapus Buku: Kemampuan memperbarui atau menghapus data buku
+Barcode/QR Code: Sistem pelabelan untuk identifikasi cepat {}
+Pencarian & Filter: Kemampuan mencari buku berdasarkan berbagai kriteria
+2. Manajemen Anggota
+Pendaftaran Anggota: Form untuk mendaftarkan anggota baru
+Profil Anggota: Data anggota seperti nama, kontak, alamat, dll
+Kartu Anggota: Fitur untuk mencetak/menampilkan kartu anggota {}
+Manajemen Status: Aktif, tidak aktif, diblokir, dll
+3. Transaksi Peminjaman
+Peminjaman Buku: Proses peminjaman dengan periode waktu tertentu
+Pengembalian Buku: Proses pencatatan buku yang dikembalikan
+Perpanjangan: Opsi untuk memperpanjang masa pinjam
+Riwayat Peminjaman: Catatan semua aktivitas peminjaman per anggota
+4. Manajemen Denda
+Kalkulasi Denda: Menghitung denda untuk keterlambatan
+Pembayaran Denda: Mencatat pembayaran denda
+Pengingat: Notifikasi jatuh tempo dan denda
+5. Dashboard & Laporan
+Statistik: Buku paling populer, statistik peminjaman, dll
+Laporan Harian/Mingguan/Bulanan: Ringkasan aktivitas perpustakaan
+Laporan Inventaris: Status koleksi buku (tersedia, dipinjam, hilang, rusak)
+Laporan Keuangan: Denda yang terkumpul dan transaksi lainnya
+6. Fitur Tambahan
+Reservasi Buku: Anggota dapat memesan buku yang sedang dipinjam
+Manajemen Rak: Pelacakan lokasi fisik buku di perpustakaan
+Katalog Online: Anggota dapat mencari buku secara online
+Ulasan & Rating: Anggota dapat memberikan ulasan dan rating untuk buku
+Pengingat Email/SMS: Notifikasi untuk jatuh tempo, buku tersedia, dll
+
+
+
+Struktur Database:
+Books: Menyimpan informasi tentang buku
+Members: Data anggota perpustakaan
+Borrowings: Catatan peminjaman dan pengembalian
+Categories: Kategori/genre buku
+Authors: Informasi tentang penulis
+Publishers: Informasi penerbit
+Fines: Catatan denda
+
+
+Struktur Aplikasi Next.js:
+/app
+  /api
+    /books
+    /members
+    /borrowings
+    /categories
+  /books
+    /[id]
+    page.js (daftar buku)
+  /members
+    /[id]
+    page.js (daftar anggota)
+  /borrowings
+    /new
+    page.js (daftar peminjaman)
+  /dashboard
+    page.js
+  /admin
+    /books
+    /members
+    /reports
+  page.js (homepage)
