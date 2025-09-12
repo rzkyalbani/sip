@@ -1,95 +1,44 @@
-import prisma from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { getBookById, updateBook, deleteBook } from "@/services/bookService";
 
-// Fungsi untuk mendapatkan detail satu buku (GET)
 export async function GET(request, { params }) {
   try {
-    // Ambil ID dari parameter URL
-    const id = parseInt(params.id);
-    
-    // Cari buku berdasarkan ID
-    const book = await prisma.book.findUnique({
-      where: { id },
-      include: {
-        author: true,
-        publisher: true,
-        category: true,
-      },
-    });
-    
-    // Jika buku tidak ditemukan
+    const book = await getBookById(parseInt(params.id));
     if (!book) {
-      return NextResponse.json(
-        { error: 'Buku tidak ditemukan' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Book not found" }, { status: 404 });
     }
-    
-    // Kembalikan data buku
     return NextResponse.json(book);
   } catch (error) {
-    console.error('Error mengambil detail buku:', error);
+    console.error("Error GET book:", error);
     return NextResponse.json(
-      { error: 'Gagal mengambil detail buku' },
+      { error: "Failed to fetch book" },
       { status: 500 }
     );
   }
 }
 
-// Fungsi untuk mengupdate buku (PUT)
 export async function PUT(request, { params }) {
   try {
-    // Ambil ID dari parameter URL
-    const id = parseInt(params.id);
-    
-    // Ambil data dari body request
     const data = await request.json();
-    
-    // Perbarui data buku
-    const book = await prisma.book.update({
-      where: { id },
-      data: {
-        title: data.title,
-        authorId: parseInt(data.authorId),
-        publisherId: parseInt(data.publisherId),
-        isbn: data.isbn,
-        publicationYear: data.publicationYear ? parseInt(data.publicationYear) : null,
-        categoryId: parseInt(data.categoryId),
-        description: data.description,
-        quantity: parseInt(data.quantity) || 1,
-        availableQuantity: parseInt(data.availableQuantity) || 1,
-        location: data.location,
-      },
-    });
-    
-    // Kembalikan data buku yang diperbarui
+    const book = await updateBook(parseInt(params.id), data);
     return NextResponse.json(book);
   } catch (error) {
-    console.error('Error mengupdate buku:', error);
+    console.error("Error PUT book:", error);
     return NextResponse.json(
-      { error: 'Gagal mengupdate buku' },
+      { error: "Failed to update book" },
       { status: 500 }
     );
   }
 }
 
-// Fungsi untuk menghapus buku (DELETE)
 export async function DELETE(request, { params }) {
   try {
-    // Ambil ID dari parameter URL
-    const id = parseInt(params.id);
-    
-    // Hapus buku dari database
-    await prisma.book.delete({
-      where: { id },
-    });
-    
-    // Kembalikan respons kosong dengan status 204 (No Content)
+    await deleteBook(parseInt(params.id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error menghapus buku:', error);
+    console.error("Error DELETE book:", error);
     return NextResponse.json(
-      { error: 'Gagal menghapus buku' },
+      { error: "Failed to delete book" },
       { status: 500 }
     );
   }
