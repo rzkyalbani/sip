@@ -1,13 +1,39 @@
 import prisma from "@/lib/prisma";
 
-export async function getBooks() {
-  return prisma.book.findMany({
-    include: {
-      author: true,
-      publisher: true,
-      category: true,
-    },
-  });
+export async function getBooks({ search, categoryId, page = 1, limit = 10 }) {
+  const where = {
+    ...(search
+      ? {
+          title: {
+            contains: search,
+          },
+        }
+      : {}),
+    ...(categoryId ? { categoryId: parseInt(categoryId) } : {}),
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.book.findMany({
+      where,
+      include: {
+        author: true,
+        publisher: true,
+        category: true,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.book.count({ where }),
+  ]);
+
+  return {
+    data,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 export async function getBookById(id) {

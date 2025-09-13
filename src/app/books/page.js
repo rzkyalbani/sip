@@ -2,9 +2,20 @@
 
 import Link from "next/link";
 import { useFetch } from "@/hooks/useFetch";
+import { useState } from "react";
 
 export default function BooksPage() {
-  const { data: books, loading, error } = useFetch("/api/books");
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [page, setPage] = useState(1);
+
+  const { data, loading, error } = useFetch(
+    `/api/books?search=${search}&categoryId=${category}&page=${page}&limit=10`
+  );
+  const { data: categories } = useFetch("/api/categories");
+
+  const books = data?.data || [];
+  const totalPages = data?.totalPages || 1;
 
   if (loading) return <div className="text-center p-8">Loading...</div>;
   if (error)
@@ -20,6 +31,28 @@ export default function BooksPage() {
         >
           Tambah Buku
         </Link>
+      </div>
+
+      <div className="flex gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Cari judul..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="">Semua Kategori</option>
+          {(categories || []).map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {books.length === 0 ? (
@@ -72,6 +105,15 @@ export default function BooksPage() {
           </tbody>
         </table>
       )}
+      <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+        Prev
+      </button>
+      <span>
+        Page {page} of {totalPages}
+      </span>
+      <button disabled={page === totalPages} onClick={() => setPage(page + 1)}>
+        Next
+      </button>
     </div>
   );
 }

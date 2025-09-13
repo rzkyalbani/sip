@@ -1,9 +1,17 @@
 import { createBook, getBooks } from "@/services/bookService";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const books = await getBooks();
+    const { searchParams } = new URL(request.url);
+
+    const search = searchParams.get("search") || undefined;
+    const categoryId = searchParams.get("categoryId") || undefined;
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+
+    const books = await getBooks({ search, categoryId, page, limit });
+
     return NextResponse.json(books);
   } catch (error) {
     console.error("Error GET books:", error);
