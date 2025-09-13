@@ -22,7 +22,7 @@ export async function GET(req, { params }) {
 export async function PUT(req, { params }) {
   try {
     const data = await req.json();
-    const author = await updateAuthor(parseInt(params.id), data);
+    const author = await updateAuthor(parseInt((await params).id), data);
     return NextResponse.json(author);
   } catch {
     return NextResponse.json(
@@ -34,7 +34,7 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   try {
-    await deleteAuthor(parseInt(params.id));
+    await deleteAuthor(parseInt((await params).id));
     return new NextResponse(null, { status: 204 });
   } catch {
     return NextResponse.json(
