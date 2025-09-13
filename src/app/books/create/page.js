@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useFetch } from "@/hooks/useFetch";
+import { usePost } from "@/hooks/usePost";
 
 export default function CreateBookPage() {
   const router = useRouter();
@@ -18,35 +20,28 @@ export default function CreateBookPage() {
     location: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [authors, setAuthors] = useState([]);
-  const [publishers, setPublishers] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const {
+    postData,
+    loading: postLoading,
+    error: postError,
+  } = usePost("/api/books");
 
   // Mengambil data untuk dropdown
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const [authorsRes, publishersRes, categoriesRes] = await Promise.all([
-          fetch("/api/authors"),
-          fetch("/api/publishers"),
-          fetch("/api/categories"),
-        ]);
-
-        const authorsData = await authorsRes.json();
-        const publishersData = await publishersRes.json();
-        const categoriesData = await categoriesRes.json();
-
-        setAuthors(authorsData);
-        setPublishers(publishersData);
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error("Error fetching dropdown data:", error);
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
+  const {
+    data: authors,
+    loading: authorsLoading,
+    error: authorsError,
+  } = useFetch("/api/authors");
+  const {
+    data: publishers,
+    loading: publishersLoading,
+    error: publishersError,
+  } = useFetch("/api/publishers");
+  const {
+    data: categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useFetch("/api/categories");
 
   // Menghandle perubahan input
   const handleChange = (e) => {
@@ -60,27 +55,13 @@ export default function CreateBookPage() {
   // Menghandle submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-      const response = await fetch("/api/books", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal menambahkan buku");
-      }
-
+      await postData(formData);
       router.push("/books");
       router.refresh();
     } catch (error) {
       alert(`Error: ${error.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -111,7 +92,7 @@ export default function CreateBookPage() {
             className="w-full p-2 border rounded"
           >
             <option value="">Pilih Penulis</option>
-            {authors.map((author) => (
+            {(authors || []).map((author) => (
               <option key={author.id} value={author.id}>
                 {author.name}
               </option>
@@ -129,7 +110,7 @@ export default function CreateBookPage() {
             className="w-full p-2 border rounded"
           >
             <option value="">Pilih Penerbit</option>
-            {publishers.map((publisher) => (
+            {(publishers || []).map((publisher) => (
               <option key={publisher.id} value={publisher.id}>
                 {publisher.name}
               </option>
@@ -147,7 +128,7 @@ export default function CreateBookPage() {
             className="w-full p-2 border rounded"
           >
             <option value="">Pilih Kategori</option>
-            {categories.map((category) => (
+            {(categories || []).map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>
@@ -216,10 +197,10 @@ export default function CreateBookPage() {
         <div className="flex space-x-4 pt-4">
           <button
             type="submit"
-            disabled={loading}
+            disabled={postLoading}
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
           >
-            {loading ? "Menyimpan..." : "Simpan"}
+            {postLoading ? "Menyimpan..." : "Simpan"}
           </button>
           <Link
             href="/books"

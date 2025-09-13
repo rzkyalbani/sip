@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useFetch } from "@/hooks/useFetch";
+import { useUpdate } from "@/hooks/useUpdate";
 
 export default function EditBookPage() {
   const router = useRouter();
@@ -21,64 +23,38 @@ export default function EditBookPage() {
     location: "",
   });
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [authors, setAuthors] = useState([]);
-  const [publishers, setPublishers] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [error, setError] = useState(null);
+  // Fetch book detail
+  const {
+    data: book,
+    loading: bookLoading,
+    error: bookError,
+  } = useFetch(`/api/books/${id}`);
 
-  // Mengambil data buku dan data dropdown
+  // Fetch dropdown data
+  const { data: authors } = useFetch("/api/authors");
+  const { data: publishers } = useFetch("/api/publishers");
+  const { data: categories } = useFetch("/api/categories");
+
+  // Update hook
+  const { updateData, loading: submitting } = useUpdate(`/api/books/${id}`);
+
+  // Set form data setelah book berhasil di-fetch
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Mengambil data buku berdasarkan ID
-        const bookRes = await fetch(`/api/books/${id}`);
-
-        if (!bookRes.ok) {
-          throw new Error("Buku tidak ditemukan");
-        }
-
-        const bookData = await bookRes.json();
-
-        // Mengambil data untuk dropdown
-        const [authorsRes, publishersRes, categoriesRes] = await Promise.all([
-          fetch("/api/authors"),
-          fetch("/api/publishers"),
-          fetch("/api/categories"),
-        ]);
-
-        const authorsData = await authorsRes.json();
-        const publishersData = await publishersRes.json();
-        const categoriesData = await categoriesRes.json();
-
-        // Set state dengan data yang diambil
-        setFormData({
-          title: bookData.title || "",
-          authorId: bookData.authorId || "",
-          publisherId: bookData.publisherId || "",
-          isbn: bookData.isbn || "",
-          publicationYear: bookData.publicationYear || "",
-          categoryId: bookData.categoryId || "",
-          description: bookData.description || "",
-          quantity: bookData.quantity || 1,
-          availableQuantity: bookData.availableQuantity || 1,
-          location: bookData.location || "",
-        });
-        setAuthors(authorsData);
-        setPublishers(publishersData);
-        setCategories(categoriesData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchData();
+    if (book) {
+      setFormData({
+        title: book.title || "",
+        authorId: book.authorId || "",
+        publisherId: book.publisherId || "",
+        isbn: book.isbn || "",
+        publicationYear: book.publicationYear || "",
+        categoryId: book.categoryId || "",
+        description: book.description || "",
+        quantity: book.quantity || 1,
+        availableQuantity: book.availableQuantity || 1,
+        location: book.location || "",
+      });
     }
-  }, [id]);
+  }, [book]);
 
   // Menghandle perubahan input
   const handleChange = (e) => {
@@ -92,37 +68,22 @@ export default function EditBookPage() {
   // Menghandle submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
 
     try {
-      const response = await fetch(`/api/books/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal memperbarui buku");
-      }
-
+      await updateData(formData);
       router.push("/books");
       router.refresh();
     } catch (err) {
       alert(`Error: ${err.message}`);
-    } finally {
-      setSubmitting(false);
     }
   };
 
-  if (loading) {
-    return <div className="text-center p-8">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center p-8 text-red-500">Error: {error}</div>;
-  }
+  if (bookLoading) return <div className="text-center p-8">Loading...</div>;
+  if (bookError)
+    return (
+      <div className="text-center p-8 text-red-500">Error: {bookError}</div>
+    );
+  if (!formData) return null;
 
   return (
     <div className="max-w-2xl mx-auto p-4">
