@@ -5,7 +5,6 @@ Fitur Umum Sistem Informasi Manajemen Perpustakaan (*{} berarti disisihkan terle
 Katalog Buku: Pencatatan detail buku (judul, penulis, penerbit, tahun terbit, ISBN, kategori/genre)
 Penambahan Buku Baru: Form untuk menambahkan buku ke inventaris
 Edit & Hapus Buku: Kemampuan memperbarui atau menghapus data buku
-Barcode/QR Code: Sistem pelabelan untuk identifikasi cepat {}
 Pencarian & Filter: Kemampuan mencari buku berdasarkan berbagai kriteria
 2. Manajemen Anggota
 Pendaftaran Anggota: Form untuk mendaftarkan anggota baru

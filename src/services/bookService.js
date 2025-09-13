@@ -40,7 +40,7 @@ export async function createBook(data) {
   });
 }
 
-export async function updateBook(data) {
+export async function updateBook(id, data) {
   return prisma.book.update({
     where: { id },
     data: {

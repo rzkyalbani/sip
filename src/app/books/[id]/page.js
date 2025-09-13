@@ -3,35 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useFetch } from "@/hooks/useFetch";
 
 export default function BookDetailPage() {
   const { id } = useParams();
-  const [book, setBook] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchBook = async () => {
-      try {
-        const response = await fetch(`/api/books/${id}`);
-
-        if (!response.ok) {
-          throw new Error("Buku tidak ditemukan");
-        }
-
-        const data = await response.json();
-        setBook(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchBook();
-    }
-  }, [id]);
+  const { data: book, loading, error } = useFetch(`/api/books/${id}`);
 
   if (loading) {
     return <div className="text-center p-8">Loading...</div>;
