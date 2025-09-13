@@ -3,7 +3,7 @@ import { getBookById, updateBook, deleteBook } from "@/services/bookService";
 
 export async function GET(request, { params }) {
   try {
-    const book = await getBookById(parseInt(params.id));
+    const book = await getBookById(parseInt(parseInt((await params).id)));
     if (!book) {
       return NextResponse.json({ error: "Book not found" }, { status: 404 });
     }
